@@ -1,4 +1,4 @@
-# WhatsApp Analyzer V6 Enterprise
+# WhatsApp Analyzer 
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Gradio](https://img.shields.io/badge/gradio-000000?style=for-the-badge&logo=gradio&logoColor=white)
@@ -8,7 +8,7 @@
 
 An advanced, offline-first tool for analyzing WhatsApp chat exports through the lens of semantic contribution, social graph topology, and deep emotional profiling.
 
-Unlike superficial analytics tools that plot simple message counts or word clouds, the WhatsApp Analyzer V6 Engine is designed for highly technical, developer-centric communities where the actual *quality* and *influence* of a contribution matter more than sheer volume.
+Unlike superficial analytics tools that plot simple message counts or word clouds, the WhatsApp Analyzer is designed for highly technical, developer-centric communities where the actual *quality* and *influence* of a contribution matter more than sheer volume.
 
 ## Core Features
 
