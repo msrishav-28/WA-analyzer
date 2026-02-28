@@ -10,6 +10,29 @@ class SocialGraphEngine:
     """
     def __init__(self):
         self.graph = nx.DiGraph()
+        
+    def generate_html(self, output_path: str = "graph.html") -> str:
+        """
+        Generates an interactive HTML network graph using pyvis.
+        Returns the raw HTML string for rendering.
+        """
+        try:
+            from pyvis.network import Network
+        except ImportError:
+            import logging
+            logging.getLogger(__name__).warning("pyvis not installed. Cannot generate HTML graph.")
+            return "<p>Interactive graph not available (pyvis not installed).</p>"
+            
+        net = Network(height="600px", width="100%", bgcolor="#ffffff", font_color="black", directed=True)
+        net.from_nx(self.graph)
+        net.toggle_physics(True)
+        
+        # Save and return HTML
+        net.save_graph(output_path)
+        with open(output_path, "r", encoding="utf-8") as f:
+            html = f.read()
+            
+        return html
 
     def compute_graph(self, messages: List, engage_win_mins: int = 30) -> Tuple[nx.DiGraph, Dict]:
         """

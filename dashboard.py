@@ -11,7 +11,7 @@ def init_pipeline(mode, api_key):
     global pipeline
     if pipeline is None:
         pipeline = V6Pipeline(mode=mode, api_key=api_key)
-    return "✅ Engine Initialized and Ready."
+    return "Engine Initialized and Ready."
 
 def analyze_chat(file_obj, mode, api_key):
     global pipeline
@@ -31,26 +31,35 @@ def analyze_chat(file_obj, mode, api_key):
         
     # Formatting output for the dashboard
     stats = results["centrality_stats"]
-    df = pd.DataFrame([
-        {
+    value_scores = results.get("value_scores", {})
+    uniqueness_scores = results.get("uniqueness_scores", {})
+    influence_scores = results.get("influence_scores", {})
+    
+    rows = []
+    for user, data in stats.items():
+        rows.append({
             "Participant": user,
+            "Value Score": round(value_scores.get(user, 0), 1),
+            "Idea Influence": round(influence_scores.get(user, 0), 3),
+            "Semantic Uniqueness": round(uniqueness_scores.get(user, 0), 3),
             "Betweenness Centrality": round(data['betweenness'], 3),
             "Eigenvector Centrality": round(data['eigenvector'], 3),
             "Messages Sent": data['out_degree']
-        }
-        for user, data in stats.items()
-    ]).sort_values(by="Betweenness Centrality", ascending=False)
+        })
+    df = pd.DataFrame(rows).sort_values(by="Value Score", ascending=False)
     
     emotions_str = json.dumps(results["emotion_sample"], indent=2) if results["has_emotions"] else "HuggingFace Transformers not active."
     topics_str = json.dumps(results["topic_sample"], indent=2) if results["has_bertopic"] else "BERTopic/HDBSCAN not active (C-compiler missing for Py3.14)."
     
     health_metrics = f"""
-    ### 🏥 V6 Network Health
+    ### V6 Network Health
     **Total Participants:** `{results['num_users']}`
     **Total Messages:** `{results['num_messages']}`
     """
+    
+    graph_html = results.get("graph_html", "<p>Graph not available.</p>")
 
-    return health_metrics, df, emotions_str, topics_str
+    return health_metrics, df, emotions_str, topics_str, graph_html
 
 custom_css = """
 .container { max-width: 1600px; margin: auto; font-family: 'Inter', sans-serif; }
@@ -64,28 +73,32 @@ with gr.Blocks(title="WhatsApp Analyzer V6 SAAS", css=custom_css) as demo:
         
         with gr.Row():
             with gr.Column(scale=1):
-                gr.Markdown("### ⚙️ Engine Configuration")
+                gr.Markdown("### Engine Configuration")
                 engine_mode = gr.Dropdown(choices=["local", "api"], value="local", label="V6 Embedding Mode")
                 api_key = gr.Textbox(placeholder="PPLX API Key...", type="password", label="Perplexity API Key")
                 file_input = gr.File(label="Upload WhatsApp Export (.txt)")
-                analyze_btn = gr.Button("🚀 Launch V6 Analytics Pipeline", variant="primary", size="lg")
+                analyze_btn = gr.Button("Launch V6 Analytics Pipeline", variant="primary", size="lg")
                 
             with gr.Column(scale=3):
-                health_out = gr.Markdown("### ⏳ Awaiting Data...")
+                health_out = gr.Markdown("### Awaiting Data...")
                 with gr.Tabs():
-                    with gr.TabItem("📊 Social Network Leaders"):
+                    with gr.TabItem("Interactive Network Graph"):
+                        graph_box = gr.HTML()
+                    with gr.TabItem("Social Network Leaders"):
                         leaderboard = gr.DataFrame(interactive=False)
-                    with gr.TabItem("🎭 Deep Emotion Profiling (RoBERTa)"):
+                    with gr.TabItem("Deep Emotion Profiling (RoBERTa)"):
                         emotions_box = gr.Code(language="json")
-                    with gr.TabItem("🧠 Semantic Topics (BERTopic)"):
+                    with gr.TabItem("Semantic Topics (BERTopic)"):
                         topics_box = gr.Code(language="json")
 
         analyze_btn.click(
             fn=analyze_chat,
             inputs=[file_input, engine_mode, api_key],
-            outputs=[health_out, leaderboard, emotions_box, topics_box]
+            outputs=[health_out, leaderboard, emotions_box, topics_box, graph_box]
         )
 
 if __name__ == "__main__":
-    print("Starting V6 Dashboard...")
+    import logging
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logging.info("Starting V6 Dashboard...")
     demo.launch()

@@ -1,32 +1,30 @@
 import re, math
 from datetime import datetime
-from dataclasses import dataclass, field
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Set
 
-@dataclass
-class Message:
+class Message(BaseModel):
     timestamp: datetime
     sender:    str
     content:   str
     index:     int
 
-@dataclass
-class UserStats:
+class UserStats(BaseModel):
     name:                str
-    messages:            List[Message] = field(default_factory=list)
+    messages:            List[Message] = Field(default_factory=list)
     replies_triggered:   int  = 0
-    unique_engagers:     set  = field(default_factory=set)
+    unique_engagers:     Set[str]  = Field(default_factory=set)
     conversation_starts: int  = 0
     questions_asked:     int  = 0
     questions_answered:  int  = 0
     code_snippets:       int  = 0
     links_shared:        int  = 0
     total_words:         int  = 0
-    unique_words:        set  = field(default_factory=set)
-    msg_embeddings:      list = field(default_factory=list)
-    msg_types:           list = field(default_factory=list)
-    sentiment_scores:    list = field(default_factory=list)
-    response_latencies:  list = field(default_factory=list)
+    unique_words:        Set[str]  = Field(default_factory=set)
+    msg_embeddings:      list = Field(default_factory=list)
+    msg_types:           list = Field(default_factory=list)
+    sentiment_scores:    list = Field(default_factory=list)
+    response_latencies:  list = Field(default_factory=list)
 
     @property
     def message_count(self): return len(self.messages)

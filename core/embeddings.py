@@ -1,6 +1,9 @@
 import os
+import logging
 import numpy as np
 from typing import List, Tuple, Dict
+
+logger = logging.getLogger(__name__)
 
 class EmbeddingEngine:
     """
@@ -27,7 +30,7 @@ class EmbeddingEngine:
         try:
             from sentence_transformers import SentenceTransformer
             self._model = SentenceTransformer(self.LOCAL_MODEL)
-            print(f"✅  Loaded V6 Local Model: {self.LOCAL_MODEL} (1024-dim, Multilingual)")
+            logger.info(f"Loaded V6 Local Model: {self.LOCAL_MODEL} (1024-dim, Multilingual)")
         except ImportError:
             raise ImportError("Please install sentence-transformers.")
 
@@ -37,7 +40,7 @@ class EmbeddingEngine:
             raise ValueError("PPLX_API_KEY not set!")
         from openai import OpenAI
         self._client = OpenAI(api_key=key, base_url="https://api.perplexity.ai")
-        print(f"✅  Loaded V6 API Model: {self.API_MODEL}")
+        logger.info(f"Loaded V6 API Model: {self.API_MODEL}")
 
     def encode(self, texts: List[str]) -> np.ndarray:
         if self.mode == 'api':

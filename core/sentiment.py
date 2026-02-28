@@ -1,4 +1,7 @@
 from typing import List, Dict
+import logging
+
+logger = logging.getLogger(__name__)
 
 class EmotionAnalyzer:
     """
@@ -9,9 +12,9 @@ class EmotionAnalyzer:
     def __init__(self):
         try:
             from transformers import pipeline
-            print("⏳ Loading RoBERTa Emotion Classifier (this may take a minute)...")
+            logger.info("Loading RoBERTa Emotion Classifier (this may take a minute)...")
             self.classifier = pipeline("text-classification", model="SamLowe/roberta-base-go_emotions", top_k=1)
-            print("✅ Loaded SamLowe/roberta-base-go_emotions")
+            logger.info("Loaded SamLowe/roberta-base-go_emotions")
         except ImportError:
             raise ImportError("Please install transformers and torch.")
 

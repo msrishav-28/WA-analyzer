@@ -1,5 +1,8 @@
 import numpy as np
-from typing import List, Dict, Optional
+import logging
+from typing import List, Dict, Tuple, Optional
+
+logger = logging.getLogger(__name__)
 
 class TopicDiscoverer:
     """
@@ -12,7 +15,7 @@ class TopicDiscoverer:
             from hdbscan import HDBSCAN
             from umap import UMAP
             
-            print("⏳ Initializing BERTopic Engine...")
+            logger.info("Initializing BERTopic Engine...")
             # We tune HDBSCAN for short sparse conversational text
             hdbscan_model = HDBSCAN(min_cluster_size=3, metric='euclidean', cluster_selection_method='eom', prediction_data=True)
             # UMAP initialized for clustering short text embeddings
@@ -26,7 +29,7 @@ class TopicDiscoverer:
                 language="multilingual",
                 calculate_probabilities=False
             )
-            print("✅ BERTopic Initialized.")
+            logger.info("BERTopic Initialized.")
         except ImportError:
             raise ImportError("Please ensure bertopic is installed in the environment.")
 
